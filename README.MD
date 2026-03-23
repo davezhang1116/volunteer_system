@@ -7,7 +7,7 @@ This is a potential addition for the American Data’s volunteering system “ht
 ## 1. System Architecture & Tech Stack Recommendations
 To handle the dynamic interfaces and complex statistical weighting required, the architecture must be efficient and scalable.
 
-**Backend & Matching Engine:** Python-based (utilizing frameworks like Flask or FastAPI) to handle data processing, statistical weighting, and NLP tasks.
+**Backend & Matching Engine:** Python-based (utilizing frameworks like Flask) to handle data processing, statistical weighting, and NLP tasks.
 
 **Frontend:** A responsive JavaScript framework to handle UI (scheduling, real-time feeds).
 
@@ -38,8 +38,8 @@ The system requires structured data from four distinct user types to facilitate 
 ## 3. The Multi-Layered Matching Engine (The "AI" Core)
 The matching algorithm processes candidate pools through sequential filters and scoring matrices to generate a "Match Percentage."
 
-**Layer 1: Constraint Filtering (still need more work because people always make time for what's important to them)**
-Eliminates mathematically impossible matches based on schedule conflicts or missing mandatory compliance documents. (In my experience, some doctors give expections and some don't)
+**Layer 1: Constraint Filtering (Not implementated)**
+Eliminates mathematically impossible matches based on schedule conflicts or missing mandatory compliance documents. (In my experience, some doctors give expections and some don't. In the end, I did not implement this because I think it should be up to the volunteer coordinators to decide.)
 
 **Layer 2: NLP Semantic Matching**
 Utilizes a lightweight Natural Language Processing (NLP) model to map the volunteer’s "Interest Keywords" and "Career Goals" against Researcher "Projects" or Resident "Life Histories." This ensures semantic hits even without exact phrasing (matching "neurodegeneration" with "dementia").

@@ -82,8 +82,14 @@ class Matcher:
             hobby_overlap = 0.0
 
         # Layer 3: The Weighted Scoring Matrix
-        # This is a simplified version, as soft skills and language compatibility are not yet implemented
-        score = hobby_overlap * 0.5
+        # Since soft skills and language compatibility are combined in the text fields,
+        # we use the overall semantic similarity as the primary base score.
+        score = hobby_overlap
+
+        # Layer 4: The "Consistency Multiplier"
+        if volunteer.availability and 'recurring' in volunteer.availability.lower():
+            score *= 1.2  # Apply a 20% boost for consistency
+            
         return float(score)
 
     def _calculate_care_coordinator_match_score(self, volunteer, care_coordinator):
@@ -98,7 +104,12 @@ class Matcher:
         skills_overlap = self._calculate_set_overlap(volunteer.skills, care_coordinator.shift_requirements)
 
         score = similarity * 0.6 + skills_overlap * 0.4
-        return float(score)
+        
+        # Layer 4: The "Consistency Multiplier"
+        if volunteer.availability and 'recurring' in volunteer.availability.lower():
+            score *= 1.2  # Apply a 20% boost for consistency
+            
+        return float(min(score, 1.0))
     
     def _calculate_set_overlap(self, set1_str, set2_str):
         if not set1_str or not set2_str:
