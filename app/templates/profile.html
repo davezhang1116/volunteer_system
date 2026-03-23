@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-50 text-gray-800 font-sans min-h-screen flex flex-col">
+    <header class="bg-blue-600 text-white shadow-md">
+        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+            <h1 class="text-2xl font-bold">Profile</h1>
+            <nav class="flex space-x-4">
+                <a href="{{ url_for('index') }}" class="hover:text-blue-200 transition">Home</a>
+                <a href="{{ url_for('logout') }}" class="hover:text-blue-200 transition">Logout</a>
+            </nav>
+        </div>
+    </header>
+    <main class="flex-grow container mx-auto px-4 py-8">
+        <div class="max-w-2xl mx-auto bg-white p-8 rounded-lg shadow-sm border border-gray-200">
+            <h2 class="text-2xl font-bold mb-6 text-gray-800 border-b pb-2">Edit Profile</h2>
+
+            {% if user_profile.linked_status is defined and user_profile.linked_status %}
+            <div class="mb-6 bg-blue-50 border border-blue-200 text-blue-800 px-4 py-3 rounded relative">
+                <span class="font-bold">Linked Status:</span> <span class="linked-status">{{ user_profile.linked_status
+                    }}</span>
+            </div>
+            {% endif %}
+
+            {% with messages = get_flashed_messages() %}
+            {% if messages %}
+            <div class="mb-6">
+                {% for message in messages %}
+                <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative"
+                    role="alert">
+                    <span class="block sm:inline">{{ message }}</span>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+            {% endwith %}
+            <form method="post" class="space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Name</label>
+                        <input type="text" name="name" placeholder="Name" value="{{ user_profile.name }}" required
+                            class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                        <input type="email" name="email" placeholder="Email" value="{{ user_profile.email }}" required
+                            class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                </div>
+
+                {% if is_volunteer %}
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Major</label>
+                        <input type="text" name="major" placeholder="Major"
+                            value="{{ user_profile.major if user_profile.major else '' }}"
+                            class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Minor</label>
+                        <input type="text" name="minor" placeholder="Minor"
+                            value="{{ user_profile.minor if user_profile.minor else '' }}"
+                            class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Year of Study</label>
+                    <input type="text" name="year_of_study" placeholder="Year of Study"
+                        value="{{ user_profile.year_of_study if user_profile.year_of_study else '' }}"
+                        class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Career Goals</label>
+                    <input type="text" name="career_goals" placeholder="Career Goals"
+                        value="{{ user_profile.career_goals if user_profile.career_goals else '' }}"
+                        class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Skills (comma-separated)</label>
+                    <input type="text" name="skills" placeholder="Skills"
+                        value="{{ user_profile.skills if user_profile.skills else '' }}"
+                        class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Interest Keywords
+                        (comma-separated)</label>
+                    <input type="text" name="interest_keywords" placeholder="Interest Keywords"
+                        value="{{ user_profile.interest_keywords if user_profile.interest_keywords else '' }}"
+                        class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Availability</label>
+                    <input type="text" name="availability" placeholder="Availability"
+                        value="{{ user_profile.availability if user_profile.availability else '' }}"
+                        class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                {% endif %}
+
+                {% if is_doctor %}
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Specialty</label>
+                    <input type="text" name="specialty" placeholder="Specialty"
+                        value="{{ user_profile.specialty if user_profile.specialty else '' }}"
+                        class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Current Projects</label>
+                    <input type="text" name="current_projects" placeholder="Current Projects"
+                        value="{{ user_profile.current_projects if user_profile.current_projects else '' }}"
+                        class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Required Skills
+                        (comma-separated)</label>
+                    <input type="text" name="required_skills" placeholder="Required Skills"
+                        value="{{ user_profile.required_skills if user_profile.required_skills else '' }}"
+                        class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                {% endif %}
+
+                {% if is_cc %}
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Facility Programs</label>
+                    <input type="text" name="facility_programs" placeholder="Facility Programs"
+                        value="{{ user_profile.facility_programs if user_profile.facility_programs else '' }}"
+                        class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Shift Requirements</label>
+                    <input type="text" name="shift_requirements" placeholder="Shift Requirements"
+                        value="{{ user_profile.shift_requirements if user_profile.shift_requirements else '' }}"
+                        class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                {% endif %}
+
+                {% if is_resident %}
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Life History</label>
+                    <input type="text" name="life_history" placeholder="Life History"
+                        value="{{ user_profile.life_history if user_profile.life_history else '' }}"
+                        class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Hobbies</label>
+                    <input type="text" name="hobbies" placeholder="Hobbies"
+                        value="{{ user_profile.hobbies if user_profile.hobbies else '' }}"
+                        class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Cognitive Profile</label>
+                    <input type="text" name="cognitive_profile" placeholder="Cognitive Profile"
+                        value="{{ user_profile.cognitive_profile if user_profile.cognitive_profile else '' }}"
+                        class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                {% endif %}
+
+                <div class="pt-4">
+                    <button type="submit"
+                        class="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition">Update
+                        Profile</button>
+                </div>
+            </form>
+        </div>
+    </main>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+
+</html>

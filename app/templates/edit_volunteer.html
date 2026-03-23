@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Volunteer - Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-50 text-gray-800 font-sans min-h-screen flex flex-col">
+    <header class="bg-blue-600 text-white shadow-md">
+        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+            <h1 class="text-2xl font-bold">Admin Dashboard</h1>
+            <nav class="flex space-x-4">
+                <a href="{{ url_for('index') }}" class="hover:text-blue-200 transition">Home</a>
+                <a href="{{ url_for('logout') }}" class="hover:text-blue-200 transition">Logout</a>
+            </nav>
+        </div>
+    </header>
+    <main class="flex-grow container mx-auto px-4 py-8">
+        <div class="max-w-2xl mx-auto bg-white p-8 rounded-lg shadow-sm border border-gray-200">
+            <div class="flex justify-between items-center mb-6 border-b pb-2">
+                <h2 class="text-2xl font-bold text-gray-800">Edit Volunteer: {{ volunteer.name }}</h2>
+                <form method="post"
+                    action="{{ url_for('toggle_active', entity_type='volunteer', user_id=volunteer.id) }}">
+                    <button type="submit"
+                        class="px-3 py-1 text-sm font-semibold rounded-full {{ 'bg-green-100 text-green-800 hover:bg-green-200' if volunteer.is_active else 'bg-gray-100 text-gray-800 hover:bg-gray-200' }} shadow-sm transition">
+                        {{ 'Active (Click to Deactivate)' if volunteer.is_active else 'Inactive (Click to Activate)' }}
+                    </button>
+                </form>
+            </div>
+
+            {% if volunteer.linked_status is defined and volunteer.linked_status %}
+            <div
+                class="mb-6 bg-blue-50 border border-blue-200 text-blue-800 px-4 py-3 rounded relative flex justify-between items-center shadow-sm">
+                <div><span class="font-bold">Linked Status:</span> <span class="linked-status"
+                        data-user-id="{{ volunteer.id }}" data-entity-type="volunteer">{{
+                        volunteer.linked_status }}</span></div>
+                <form method="post"
+                    action="{{ url_for('unlink_user', entity_type='volunteer', user_id=volunteer.id) }}">
+                    <button type="submit"
+                        class="bg-red-500 hover:bg-red-600 text-white font-bold py-1 px-3 rounded shadow-sm text-sm transition"
+                        onclick="return confirm('Are you sure you want to terminate this link? Both users will become active again.');">Unlink</button>
+                </form>
+            </div>
+            {% endif %}
+
+            {% with messages = get_flashed_messages() %}
+            {% if messages %}
+            <div class="mb-6">
+                {% for message in messages %}
+                <div class="bg-blue-100 border border-blue-400 text-blue-700 px-4 py-3 rounded relative" role="alert">
+                    <span class="block sm:inline">{{ message }}</span>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+            {% endwith %}
+            <form method="post" class="space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Name</label>
+                        <input type="text" name="name" placeholder="Name" value="{{ volunteer.name }}" required
+                            class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                        <input type="email" name="email" placeholder="Email" value="{{ volunteer.email }}" required
+                            class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Major</label>
+                        <input type="text" name="major" placeholder="Major"
+                            value="{{ volunteer.major if volunteer.major else '' }}"
+                            class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Minor</label>
+                        <input type="text" name="minor" placeholder="Minor"
+                            value="{{ volunteer.minor if volunteer.minor else '' }}"
+                            class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Year of Study</label>
+                    <input type="text" name="year_of_study" placeholder="Year of Study"
+                        value="{{ volunteer.year_of_study if volunteer.year_of_study else '' }}"
+                        class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Career Goals</label>
+                    <input type="text" name="career_goals" placeholder="Career Goals"
+                        value="{{ volunteer.career_goals if volunteer.career_goals else '' }}"
+                        class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Skills (comma-separated)</label>
+                    <input type="text" name="skills" placeholder="Skills"
+                        value="{{ volunteer.skills if volunteer.skills else '' }}"
+                        class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Interest Keywords
+                        (comma-separated)</label>
+                    <input type="text" name="interest_keywords" placeholder="Interest Keywords"
+                        value="{{ volunteer.interest_keywords if volunteer.interest_keywords else '' }}"
+                        class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Availability</label>
+                    <input type="text" name="availability" placeholder="Availability"
+                        value="{{ volunteer.availability if volunteer.availability else '' }}"
+                        class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div class="pt-4 flex space-x-4">
+                    <button type="submit"
+                        class="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition">Update
+                        Volunteer</button>
+                    <a href="{{ url_for('index') }}"
+                        class="w-full bg-gray-200 text-gray-800 py-3 rounded-lg font-semibold hover:bg-gray-300 transition text-center flex items-center justify-center">Cancel</a>
+                </div>
+            </form>
+
+            <div class="mt-8 border-t border-gray-200 pt-6">
+                <h3 class="text-xl font-bold mb-4 text-gray-800">Find Matches</h3>
+                <div class="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4 mb-6">
+                    <button type="button" id="btn-match-doctors"
+                        class="bg-indigo-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-indigo-700 transition w-full sm:w-auto shadow-sm">Match
+                        with Doctors</button>
+                    <button type="button" id="btn-match-residents"
+                        class="bg-teal-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-teal-700 transition w-full sm:w-auto shadow-sm">Match
+                        with Residents & Coordinators</button>
+                </div>
+                <div class="flex flex-col md:flex-row gap-6">
+                    <div id="volunteer-matches-container" class="space-y-6 flex-1"></div>
+                    <div id="match-details-container"
+                        class="flex-1 bg-gray-50 p-6 rounded-lg border border-gray-200 hidden flex-col justify-between">
+                        <div>
+                            <h4 class="text-lg font-bold text-gray-800 mb-4 border-b pb-2" id="match-details-title">
+                                Details</h4>
+                            <div id="match-details-content" class="text-sm space-y-3 text-gray-700 mb-6"></div>
+                        </div>
+                        <div id="match-action-container" class="mt-4 pt-4 border-t border-gray-200 hidden">
+                            <label class="flex items-center space-x-2 text-sm text-gray-700 mb-4 cursor-pointer">
+                                <input type="checkbox" id="keep-active-checkbox"
+                                    class="rounded border-gray-300 text-blue-600 focus:ring-blue-500 w-4 h-4">
+                                <span>Keep names on the active list</span>
+                            </label>
+                            <button type="button" id="btn-confirm-match"
+                                class="w-full bg-green-600 text-white py-2 rounded-lg font-semibold hover:bg-green-700 transition">
+                                Confirm Match
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const btnMatchDoctors = document.getElementById('btn-match-doctors');
+            const btnMatchResidents = document.getElementById('btn-match-residents');
+            const matchesContainer = document.getElementById('volunteer-matches-container');
+
+            let currentMatch = null;
+            const actionContainer = document.getElementById('match-action-container');
+            const btnConfirmMatch = document.getElementById('btn-confirm-match');
+            const keepActiveCheckbox = document.getElementById('keep-active-checkbox');
+
+            const fetchAndDisplayMatches = async (type) => {
+                matchesContainer.innerHTML = '<p class="text-gray-500 animate-pulse">Calculating matches using WordLlama...</p>';
+                const detailsContainer = document.getElementById('match-details-container');
+                detailsContainer.classList.add('hidden');
+                detailsContainer.classList.remove('flex');
+                try {
+                    const response = await fetch(`/admin/volunteer/{{ volunteer.id }}/matches`);
+                    const data = await response.json();
+
+                    let html = '';
+                    if (type === 'doctors') {
+                        html += `<h4 class="text-lg font-semibold text-gray-800 mb-2 border-b pb-1">Doctor Matches</h4>`;
+                        if (data.doctor_matches && data.doctor_matches.length > 0) {
+                            html += `<ul class="list-disc pl-5 space-y-2">`;
+                            data.doctor_matches.forEach(match => {
+                                html += `<li class="text-gray-700"><a href="javascript:void(0)" onclick="fetchMatchDetails('doctor', ${match.doctor_id})" class="text-blue-600 hover:text-blue-800 hover:underline font-medium">${match.doctor}</a> <span class="text-sm text-gray-500 ml-2">(Score: <span class="font-bold text-blue-600">${match.score.toFixed(2)}</span>)</span></li>`;
+                            });
+                            html += `</ul>`;
+                        } else {
+                            html += `<p class="text-gray-500 italic">No doctors available.</p>`;
+                        }
+                    } else if (type === 'residents') {
+                        html += `<h4 class="text-lg font-semibold text-gray-800 mb-2 border-b pb-1">Resident Matches</h4>`;
+                        if (data.resident_matches && data.resident_matches.length > 0) {
+                            html += `<ul class="list-disc pl-5 space-y-2 mb-6">`;
+                            data.resident_matches.forEach(match => {
+                                html += `<li class="text-gray-700"><a href="javascript:void(0)" onclick="fetchMatchDetails('resident', ${match.resident_id})" class="text-blue-600 hover:text-blue-800 hover:underline font-medium">${match.resident}</a> <span class="text-sm text-gray-500 ml-2">(Score: <span class="font-bold text-blue-600">${match.score.toFixed(2)}</span>)</span></li>`;
+                            });
+                            html += `</ul>`;
+                        } else {
+                            html += `<p class="text-gray-500 italic mb-6">No residents available.</p>`;
+                        }
+
+                        html += `<h4 class="text-lg font-semibold text-gray-800 mb-2 border-b pb-1">Care Coordinator Matches</h4>`;
+                        if (data.care_coordinator_matches && data.care_coordinator_matches.length > 0) {
+                            html += `<ul class="list-disc pl-5 space-y-2">`;
+                            data.care_coordinator_matches.forEach(match => {
+                                html += `<li class="text-gray-700"><a href="javascript:void(0)" onclick="fetchMatchDetails('care_coordinator', ${match.care_coordinator_id})" class="text-blue-600 hover:text-blue-800 hover:underline font-medium">${match.care_coordinator}</a> <span class="text-sm text-gray-500 ml-2">(Score: <span class="font-bold text-blue-600">${match.score.toFixed(2)}</span>)</span></li>`;
+                            });
+                            html += `</ul>`;
+                        } else {
+                            html += `<p class="text-gray-500 italic">No care coordinators available.</p>`;
+                        }
+                    }
+                    matchesContainer.innerHTML = html;
+                } catch (error) {
+                    matchesContainer.innerHTML = '<p class="text-red-500">Error loading matches.</p>';
+                }
+            };
+
+            window.fetchMatchDetails = async (type, id) => {
+                const container = document.getElementById('match-details-container');
+                const title = document.getElementById('match-details-title');
+                const content = document.getElementById('match-details-content');
+
+                container.classList.remove('hidden');
+                container.classList.add('flex');
+                actionContainer.classList.add('hidden');
+                content.innerHTML = '<p class="text-gray-500 animate-pulse">Loading details...</p>';
+
+                try {
+                    let endpoint = '';
+                    if (type === 'doctor') endpoint = `/doctors/${id}`;
+                    else if (type === 'resident') endpoint = `/residents/${id}`;
+                    else if (type === 'care_coordinator') endpoint = `/care-coordinators/${id}`;
+
+                    const response = await fetch(endpoint);
+                    const data = await response.json();
+
+                    title.textContent = `${data.name} - Details`;
+
+                    let detailsHtml = '';
+                    if (type === 'doctor') {
+                        detailsHtml += `<p><strong>Email:</strong> ${data.email || 'N/A'}</p>`;
+                        detailsHtml += `<p><strong>Specialty:</strong> ${data.specialty || 'N/A'}</p>`;
+                        detailsHtml += `<p><strong>Current Projects:</strong> ${data.current_projects || 'N/A'}</p>`;
+                        detailsHtml += `<p><strong>Required Skills:</strong> ${data.required_skills || 'N/A'}</p>`;
+                    } else if (type === 'resident') {
+                        detailsHtml += `<p><strong>Life History:</strong> ${data.life_history || 'N/A'}</p>`;
+                        detailsHtml += `<p><strong>Hobbies:</strong> ${data.hobbies || 'N/A'}</p>`;
+                        detailsHtml += `<p><strong>Cognitive Profile:</strong> ${data.cognitive_profile || 'N/A'}</p>`;
+                    } else if (type === 'care_coordinator') {
+                        detailsHtml += `<p><strong>Email:</strong> ${data.email || 'N/A'}</p>`;
+                        detailsHtml += `<p><strong>Facility Programs:</strong> ${data.facility_programs || 'N/A'}</p>`;
+                        detailsHtml += `<p><strong>Shift Requirements:</strong> ${data.shift_requirements || 'N/A'}</p>`;
+                    }
+                    content.innerHTML = detailsHtml;
+
+                    currentMatch = { type, id };
+                    actionContainer.classList.remove('hidden');
+                } catch (error) {
+                    content.innerHTML = '<p class="text-red-500">Error loading details.</p>';
+                }
+            };
+
+            if (btnConfirmMatch) {
+                btnConfirmMatch.addEventListener('click', async () => {
+                    if (!currentMatch) return;
+
+                    const keepActive = keepActiveCheckbox.checked;
+                    btnConfirmMatch.disabled = true;
+                    btnConfirmMatch.textContent = 'Confirming...';
+
+                    try {
+                        const response = await fetch('/admin/confirm_match', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                volunteer_id: {{ volunteer.id }},
+                            match_type: currentMatch.type,
+                            match_id: currentMatch.id,
+                            keep_active: keepActive
+                            })
+            });
+
+        const result = await response.json();
+
+        if (response.ok) {
+            alert('Match confirmed successfully!');
+            window.location.href = "{{ url_for('index') }}";
+        } else {
+            alert(result.error || 'Failed to confirm match.');
+            btnConfirmMatch.disabled = false;
+            btnConfirmMatch.textContent = 'Confirm Match';
+        }
+                    } catch (error) {
+            alert('Network error while confirming match.');
+            btnConfirmMatch.disabled = false;
+            btnConfirmMatch.textContent = 'Confirm Match';
+        }
+                });
+            }
+
+        if (btnMatchDoctors) {
+            btnMatchDoctors.addEventListener('click', () => fetchAndDisplayMatches('doctors'));
+        }
+        if (btnMatchResidents) {
+            btnMatchResidents.addEventListener('click', () => fetchAndDisplayMatches('residents'));
+        }
+        });
+    </script>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+
+</html>

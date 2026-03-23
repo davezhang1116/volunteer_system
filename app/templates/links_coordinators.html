@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coordinator/Resident & Volunteer Links</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-50 text-gray-800 font-sans min-h-screen flex flex-col">
+    <header class="bg-blue-600 text-white shadow-md">
+        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+            <h1 class="text-2xl font-bold">Coordinator/Resident Links</h1>
+            <nav class="flex space-x-4">
+                <a href="{{ url_for('admin') }}" class="hover:text-blue-200 transition">Back to Admin</a>
+            </nav>
+        </div>
+    </header>
+    <main class="flex-grow container mx-auto px-4 py-8">
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
+                <h2 class="text-xl font-bold text-gray-800">Active Links</h2>
+            </div>
+            <div class="p-6">
+                {% if links %}
+                <ul class="space-y-4">
+                    {% for link in links %}
+                    <li
+                        class="bg-teal-50 border border-teal-200 p-4 rounded-lg flex justify-between items-center shadow-sm">
+                        <div>
+                            <a href="{{ url_for('edit_volunteer', id=link.volunteer.id) }}"
+                                class="font-bold text-teal-600 hover:text-teal-800 hover:underline">{{
+                                link.volunteer.name }}</a>
+                            <span class="text-gray-600 mx-2">&mdash;</span>
+                            <span class="text-gray-700">Matched with
+                                {% if link.target %}
+                                {% if link.target_role == 'care_coordinator' %}
+                                <a href="{{ url_for('edit_care_coordinator', id=link.target.id) }}"
+                                    class="font-bold text-teal-600 hover:text-teal-800 hover:underline">{{
+                                    link.target.name }}</a> (Care Coordinator)
+                                {% else %}
+                                <a href="{{ url_for('edit_resident', id=link.target.id) }}"
+                                    class="font-bold text-teal-600 hover:text-teal-800 hover:underline">{{
+                                    link.target.name }}</a> (Resident)
+                                {% endif %}
+                                {% else %}
+                                {{ link.status.replace('Matched with ', '') }}
+                                {% endif %}
+                            </span>
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <p class="text-gray-500 italic">No active links for residents or care coordinators.</p>
+                {% endif %}
+            </div>
+        </div>
+    </main>
+</body>
+
+</html>

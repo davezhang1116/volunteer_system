@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Links Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-50 text-gray-800 font-sans min-h-screen flex flex-col">
+    <header class="bg-blue-600 text-white shadow-md">
+        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+            <h1 class="text-2xl font-bold">Manage Links Dashboard</h1>
+            <nav class="flex space-x-4">
+                <a href="{{ url_for('admin') }}" class="hover:text-blue-200 transition">Back to Admin</a>
+            </nav>
+        </div>
+    </header>
+    <main class="flex-grow container mx-auto px-4 py-8">
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+        <div class="mb-6">
+            {% for message in messages %}
+            <div class="bg-blue-100 border border-blue-400 text-blue-700 px-4 py-3 rounded relative shadow-sm"
+                role="alert">
+                <span class="block sm:inline">{{ message }}</span>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+
+            <!-- Volunteers Column -->
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                <div class="px-6 py-4 border-b border-gray-200 bg-blue-50">
+                    <h2 class="text-xl font-bold text-blue-800">Volunteers</h2>
+                </div>
+                <div class="p-6">
+                    {% if volunteers %}
+                    <ul class="space-y-4">
+                        {% for volunteer in volunteers %}
+                        <li
+                            class="border border-gray-100 p-4 rounded-lg shadow-sm bg-gray-50 flex flex-col gap-2 transition hover:shadow-md">
+                            <div class="flex justify-between items-center border-b pb-2 mb-2">
+                                <a href="{{ url_for('edit_volunteer', id=volunteer.id) }}"
+                                    class="font-bold text-lg text-blue-600 hover:text-blue-800 hover:underline">{{
+                                    volunteer.name }}</a>
+                                <form
+                                    action="{{ url_for('unlink_user', entity_type='volunteer', user_id=volunteer.id) }}"
+                                    method="POST">
+                                    <button type="submit"
+                                        class="text-xs bg-red-100 text-red-600 hover:bg-red-200 px-2 py-1 rounded font-semibold transition"
+                                        onclick="return confirm('Unlink all from this volunteer?');">Unlink All</button>
+                                </form>
+                            </div>
+                            <div class="text-sm text-gray-700">
+                                <span class="font-semibold text-gray-500 block mb-1">Linked with:</span>
+                                <span class="linked-status" data-user-id="{{ volunteer.id }}"
+                                    data-entity-type="volunteer">{{ volunteer.linked_status }}</span>
+                            </div>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    {% else %}
+                    <p class="text-gray-500 italic">No volunteers have active links.</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Entities Column -->
+            <div class="space-y-8">
+
+                <!-- Doctors -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                    <div class="px-6 py-4 border-b border-gray-200 bg-indigo-50">
+                        <h2 class="text-xl font-bold text-indigo-800">Doctors & Researchers</h2>
+                    </div>
+                    <div class="p-6">
+                        {% if doctors %}
+                        <ul class="space-y-4">
+                            {% for doctor in doctors %}
+                            <li
+                                class="border border-gray-100 p-4 rounded-lg shadow-sm bg-gray-50 flex flex-col gap-2 transition hover:shadow-md">
+                                <div class="flex justify-between items-center border-b pb-2 mb-2">
+                                    <a href="{{ url_for('edit_doctor', id=doctor.id) }}"
+                                        class="font-bold text-lg text-indigo-600 hover:text-indigo-800 hover:underline">{{
+                                        doctor.name }}</a>
+                                    <form action="{{ url_for('unlink_user', entity_type='doctor', user_id=doctor.id) }}"
+                                        method="POST">
+                                        <button type="submit"
+                                            class="text-xs bg-red-100 text-red-600 hover:bg-red-200 px-2 py-1 rounded font-semibold transition"
+                                            onclick="return confirm('Unlink all from this doctor?');">Unlink
+                                            All</button>
+                                    </form>
+                                </div>
+                                <div class="text-sm text-gray-700">
+                                    <span class="font-semibold text-gray-500 block mb-1">Linked with:</span>
+                                    <span class="linked-status" data-user-id="{{ doctor.id }}"
+                                        data-entity-type="doctor">{{ doctor.linked_status }}</span>
+                                </div>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                        {% else %}
+                        <p class="text-gray-500 italic">No doctors have active links.</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Care Coordinators -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                    <div class="px-6 py-4 border-b border-gray-200 bg-teal-50">
+                        <h2 class="text-xl font-bold text-teal-800">Care Coordinators</h2>
+                    </div>
+                    <div class="p-6">
+                        {% if care_coordinators %}
+                        <ul class="space-y-4">
+                            {% for cc in care_coordinators %}
+                            <li
+                                class="border border-gray-100 p-4 rounded-lg shadow-sm bg-gray-50 flex flex-col gap-2 transition hover:shadow-md">
+                                <div class="flex justify-between items-center border-b pb-2 mb-2">
+                                    <a href="{{ url_for('edit_care_coordinator', id=cc.id) }}"
+                                        class="font-bold text-lg text-teal-600 hover:text-teal-800 hover:underline">{{
+                                        cc.name }}</a>
+                                    <form
+                                        action="{{ url_for('unlink_user', entity_type='care_coordinator', user_id=cc.id) }}"
+                                        method="POST">
+                                        <button type="submit"
+                                            class="text-xs bg-red-100 text-red-600 hover:bg-red-200 px-2 py-1 rounded font-semibold transition"
+                                            onclick="return confirm('Unlink all from this care coordinator?');">Unlink
+                                            All</button>
+                                    </form>
+                                </div>
+                                <div class="text-sm text-gray-700">
+                                    <span class="font-semibold text-gray-500 block mb-1">Linked with:</span>
+                                    <span class="linked-status" data-user-id="{{ cc.id }}"
+                                        data-entity-type="care_coordinator">{{ cc.linked_status }}</span>
+                                </div>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                        {% else %}
+                        <p class="text-gray-500 italic">No care coordinators have active links.</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Residents -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                    <div class="px-6 py-4 border-b border-gray-200 bg-orange-50">
+                        <h2 class="text-xl font-bold text-orange-800">Residents</h2>
+                    </div>
+                    <div class="p-6">
+                        {% if residents %}
+                        <ul class="space-y-4">
+                            {% for resident in residents %}
+                            <li
+                                class="border border-gray-100 p-4 rounded-lg shadow-sm bg-gray-50 flex flex-col gap-2 transition hover:shadow-md">
+                                <div class="flex justify-between items-center border-b pb-2 mb-2">
+                                    <a href="{{ url_for('edit_resident', id=resident.id) }}"
+                                        class="font-bold text-lg text-orange-600 hover:text-orange-800 hover:underline">{{
+                                        resident.name }}</a>
+                                    <form
+                                        action="{{ url_for('unlink_user', entity_type='resident', user_id=resident.id) }}"
+                                        method="POST">
+                                        <button type="submit"
+                                            class="text-xs bg-red-100 text-red-600 hover:bg-red-200 px-2 py-1 rounded font-semibold transition"
+                                            onclick="return confirm('Unlink all from this resident?');">Unlink
+                                            All</button>
+                                    </form>
+                                </div>
+                                <div class="text-sm text-gray-700">
+                                    <span class="font-semibold text-gray-500 block mb-1">Linked with:</span>
+                                    <span class="linked-status" data-user-id="{{ resident.id }}"
+                                        data-entity-type="resident">{{ resident.linked_status }}</span>
+                                </div>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                        {% else %}
+                        <p class="text-gray-500 italic">No residents have active links.</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+
+</html>
