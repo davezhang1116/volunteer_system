@@ -5,6 +5,6 @@ To develop a dedicated volunteer scheduling and matching application  for the Am
 ## System Architecture
 Please refer to the document for more information.
 ## How to run the application
-1. Install the dependencies: `pip install -r requirements.txt
+1. Install the dependencies: `pip install -r requirements.txt`
 2. Initialize the database with some random data: `python seed.py`
 3. Run the application: `python run.py`
