@@ -51,5 +51,6 @@ class Resident(db.Model):
     life_history = db.Column(db.String(512))
     hobbies = db.Column(db.String(256))
     cognitive_profile = db.Column(db.String(256))
+    languages = db.Column(db.String(256))
     is_active = db.Column(db.Boolean, default=True)
     linked_status = db.Column(db.String(256), nullable=True)

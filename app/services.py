@@ -1,5 +1,6 @@
+import re
 from wordllama import WordLlama
-
+# NOTE: layer 1 (hard requirements) is removed
 class Matcher:
     def __init__(self, volunteers, doctors, care_coordinators, residents):
         self.volunteers = volunteers
@@ -32,6 +33,7 @@ class Matcher:
                     'volunteer_id': volunteer.id,
                     'resident': resident.name,
                     'resident_id': resident.id,
+                    'languages': resident.languages,
                     'score': score
                 })
             for cc in self.care_coordinators:
@@ -81,15 +83,26 @@ class Matcher:
         else:
             hobby_overlap = 0.0
 
-        # Layer 3: The Weighted Scoring Matrix
-        # Since soft skills and language compatibility are combined in the text fields,
-        # we use the overall semantic similarity as the primary base score.
-        score = hobby_overlap
+        # Soft Skills Similarity (30%)
+        soft_skills_text = f"{volunteer.skills}"
+        resident_needs_text = f"{resident.cognitive_profile} {resident.life_history}"
+        if soft_skills_text.strip() and resident_needs_text.strip():
+            soft_skills_score = max(0.0, self.wl.similarity(soft_skills_text, resident_needs_text))
+        else:
+            soft_skills_score = 0.0
 
-        # Layer 4: The "Consistency Multiplier"
-        if volunteer.availability and 'recurring' in volunteer.availability.lower():
-            score *= 1.2  # Apply a 20% boost for consistency
-            
+        # Language Compatibility (20%)
+        language_score = self._calculate_language_compatibility(
+            f"{volunteer.skills} {volunteer.interest_keywords}",
+            f"{resident.languages} {resident.life_history} {resident.hobbies} {resident.cognitive_profile}"
+        )
+
+        # Layer 3: The Weighted Scoring Matrix
+        score = (
+            hobby_overlap * 0.5 +
+            soft_skills_score * 0.3 +
+            language_score * 0.2
+        )
         return float(score)
 
     def _calculate_care_coordinator_match_score(self, volunteer, care_coordinator):
@@ -104,13 +117,47 @@ class Matcher:
         skills_overlap = self._calculate_set_overlap(volunteer.skills, care_coordinator.shift_requirements)
 
         score = similarity * 0.6 + skills_overlap * 0.4
-        
-        # Layer 4: The "Consistency Multiplier"
-        if volunteer.availability and 'recurring' in volunteer.availability.lower():
-            score *= 1.2  # Apply a 20% boost for consistency
-            
-        return float(min(score, 1.0))
+        return float(score)
     
+    def _calculate_language_compatibility(self, text1, text2):
+        languages = [
+            'english', 'spanish', 'mandarin', 'french', 'arabic', 'bengali', 
+            'russian', 'portuguese', 'indonesian', 'urdu', 'japanese', 'german', 
+            'punjabi', 'javanese', 'wu', 'telugu', 'turkish', 'korean', 'marathi', 
+            'tamil', 'italian', 'vietnamese', 'cantonese', 'hausa', 'thai', 
+            'gujarati', 'jin', 'amharic', 'kannada', 'persian', 'bhojpuri', 
+            'hakka', 'burmese', 'yoruba', 'uzbek', 'odia', 'maithili', 'sindhi', 
+            'ukrainian', 'malayalam', 'sunda', 'igbo', 'romanian', 'tagalog', 
+            'dutch', 'kurdish', 'serbian', 'malagasy', 'saraiki', 'nepali', 
+            'sinhalese', 'chittagonian', 'zhuang', 'khmer', 'turkmen', 'assamese', 
+            'madurese', 'somali', 'marwari', 'magahi', 'haryanvi', 'hungarian', 
+            'chhattisgarhi', 'greek', 'chewa', 'kinyarwanda', 'akan', 'kazakh', 
+            'sylheti', 'zulu', 'czech', 'rwanda-rundi', 'min bei', 'swedish', 
+            'hmong', 'shona', 'uyghur', 'hiligaynon', 'ilongo', 'balochi', 
+            'belarusian', 'bambara', 'konkani', 'sign language', 'asl', 'hebrew', 
+            'danish', 'finnish', 'norwegian', 'polish', 'farsi', 'hindi', 
+            'swahili', 'filipino', 'malay', 'yiddish', 'gaelic', 'welsh', 'catalan',
+            'basque', 'galician', 'esperanto', 'latin', 'hawaiian', 'maori',
+            'navajo', 'samoan', 'fijian', 'tongan', 'tahitian', 'kashmiri'
+        ]
+        
+        t1_lower = text1.lower()
+        t2_lower = text2.lower()
+        
+        t1_langs = {lang for lang in languages if re.search(r'\b' + re.escape(lang) + r'\b', t1_lower)}
+        t2_langs = {lang for lang in languages if re.search(r'\b' + re.escape(lang) + r'\b', t2_lower)}
+        
+        if not t2_langs:
+            # If the resident doesn't mention any specific language, assume default compatibility (100%)
+            return 1.0
+            
+        if t1_langs.intersection(t2_langs):
+            # They share at least one language
+            return 1.0
+            
+        # Resident mentions a language, but volunteer doesn't have it
+        return 0.0
+
     def _calculate_set_overlap(self, set1_str, set2_str):
         if not set1_str or not set2_str:
             return 0

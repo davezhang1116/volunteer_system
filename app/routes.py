@@ -262,7 +262,8 @@ def create_resident():
         name=data['name'],
         life_history=data.get('life_history'),
         hobbies=data.get('hobbies'),
-        cognitive_profile=data.get('cognitive_profile')
+        cognitive_profile=data.get('cognitive_profile'),
+        languages=data.get('languages')
     )
     db.session.add(resident)
     db.session.commit()
@@ -278,7 +279,8 @@ def get_resident(id):
         'name': resident.name,
         'life_history': resident.life_history,
         'hobbies': resident.hobbies,
-        'cognitive_profile': resident.cognitive_profile
+        'cognitive_profile': resident.cognitive_profile,
+        'languages': resident.languages
     })
 
 @app.route('/residents/<int:id>', methods=['PUT'])
@@ -291,6 +293,7 @@ def update_resident(id):
     resident.life_history = data.get('life_history', resident.life_history)
     resident.hobbies = data.get('hobbies', resident.hobbies)
     resident.cognitive_profile = data.get('cognitive_profile', resident.cognitive_profile)
+    resident.languages = data.get('languages', resident.languages)
     db.session.commit()
     return jsonify({'message': 'Resident updated successfully'})
 
@@ -696,6 +699,7 @@ def edit_resident(id):
         resident.life_history = request.form.get('life_history', '')
         resident.hobbies = request.form.get('hobbies', '')
         resident.cognitive_profile = request.form.get('cognitive_profile', '')
+        resident.languages = request.form.get('languages', '')
         db.session.commit()
         flash('Resident updated successfully.')
         return redirect(url_for('index'))
@@ -740,6 +744,7 @@ def profile():
             user_profile.life_history = request.form.get('life_history', '')
             user_profile.hobbies = request.form.get('hobbies', '')
             user_profile.cognitive_profile = request.form.get('cognitive_profile', '')
+            user_profile.languages = request.form.get('languages', '')
 
         db.session.commit()
         flash('Your profile has been updated.')

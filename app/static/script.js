@@ -148,6 +148,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 detailsHtml += `<p><strong>Life History:</strong> ${data.life_history || 'N/A'}</p>`;
                 detailsHtml += `<p><strong>Hobbies:</strong> ${data.hobbies || 'N/A'}</p>`;
                 detailsHtml += `<p><strong>Cognitive Profile:</strong> ${data.cognitive_profile || 'N/A'}</p>`;
+                detailsHtml += `<p><strong>Languages:</strong> ${data.languages || 'N/A'}</p>`;
             } else if (type === 'care_coordinator') {
                 detailsHtml += `<p><strong>Facility Programs:</strong> ${data.facility_programs || 'N/A'}</p>`;
                 detailsHtml += `<p><strong>Shift Requirements:</strong> ${data.shift_requirements || 'N/A'}</p>`;
