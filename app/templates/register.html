@@ -60,4 +60,46 @@
     </div>
 </body>
 
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Find the form elements (using ID or name attributes)
+        const roleSelect = document.getElementById('role') || document.querySelector('select[name="role"]');
+        const emailInput = document.getElementById('email') || document.querySelector('input[name="email"]');
+        const passwordInput = document.getElementById('password') || document.querySelector('input[name="password"]');
+
+        // Find the parent div containers for email and password to hide the labels as well
+        const emailContainer = emailInput ? emailInput.closest('div') : null;
+        const passwordContainer = passwordInput ? passwordInput.closest('div') : null;
+
+        function handleRoleChange() {
+            if (roleSelect && roleSelect.value === 'resident') {
+                // If resident is selected, remove required attributes and hide the fields
+                if (emailInput) {
+                    emailInput.required = false;
+                    if (emailContainer) emailContainer.style.display = 'none';
+                }
+                if (passwordInput) {
+                    passwordInput.required = false;
+                    if (passwordContainer) passwordContainer.style.display = 'none';
+                }
+            } else {
+                // For any other role, ensure fields are required and visible
+                if (emailInput) {
+                    emailInput.required = true;
+                    if (emailContainer) emailContainer.style.display = 'block';
+                }
+                if (passwordInput) {
+                    passwordInput.required = true;
+                    if (passwordContainer) passwordContainer.style.display = 'block';
+                }
+            }
+        }
+
+        if (roleSelect) {
+            roleSelect.addEventListener('change', handleRoleChange);
+            handleRoleChange(); // Run on initial load in case it's already set
+        }
+    });
+</script>
+
 </html>
